@@ -1,0 +1,23 @@
+{
+  "name": "dc-election-results",
+  "version": "0.0.1",
+  "description": "District of Columbia local election results",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kcivey/dc-election-results.git"
+  },
+  "author": {
+    "name": "Keith C. Ivey",
+    "email": "keith@iveys.org"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kcivey/dc-election-results/issues"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "^1.0.3",
+    "grunt-bump": "^0.8.0",
+    "load-grunt-tasks": "^4.0.0"
+  }
+}

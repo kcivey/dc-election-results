@@ -16,9 +16,12 @@
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
+    "csv-parse": "^4.3.3",
+    "lodash": "^4.17.11",
     "moment": "^2.24.0",
     "request": "^2.88.0",
-    "request-promise-native": "^1.0.7"
+    "request-promise-native": "^1.0.7",
+    "tabula-js": "github:kcivey/tabula-js"
   },
   "devDependencies": {
     "grunt": "^1.0.3",

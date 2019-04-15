@@ -32,7 +32,8 @@ function retrieveData() {
                     const pdfFile = await getPdfFile(date, url);
                     console.log('handling', date);
                     await processPdf(date, pdfFile);
-                } else {
+                }
+                else {
                     throw new Error(`Unexpected format "${text}"`);
                 }
             }
@@ -84,7 +85,8 @@ function processPdf(date, pdfFile) {
                         columnTitles = null;
                         ward = m && m[1] ? +m[1] : null;
                         return;
-                    } else if (!columnTitles) {
+                    }
+                    else if (!columnTitles) {
                         columnTitles = data.map(_.camelCase);
                         return;
                     }

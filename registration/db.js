@@ -1,9 +1,9 @@
 const knex = require('knex')({
     client: 'sqlite3',
     connection: {
-        filename: __dirname + '/registration-stats.sqlite'
+        filename: __dirname + '/registration-stats.sqlite',
     },
-    useNullAsDefault: true
+    useNullAsDefault: true,
 });
 const db = {};
 const statsTableName = 'stats';
@@ -23,9 +23,9 @@ db.createTables = function () {
                     'lib',
                     'np',
                     'oth',
-                    'totals'
+                    'totals',
                 ].forEach(col => table.integer(col));
-                table.unique(['date', 'precinct'])
+                table.unique(['date', 'precinct']);
             }
         );
 };
@@ -57,7 +57,7 @@ db.getTotalsForPartyAndWardByDate = function (party, ward, startDate) {
                 totalsByDate[record.date] = record.total;
             }
             return totalsByDate;
-        })
+        });
 };
 
 module.exports = db;

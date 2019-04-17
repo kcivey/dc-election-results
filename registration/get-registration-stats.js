@@ -13,6 +13,13 @@ const _ = require('lodash');
 const csvParse = require('csv-parse/lib/sync');
 const db = require('./db');
 const cacheDir = __dirname + '/cache';
+const tabulaOptions = {
+    guess: true,
+    debug: true,
+    spreadsheet: true,
+    pages: 'all',
+    silent: true,
+};
 const listUrl = 'https://www.dcboe.org/Data-Resources/Voter-Registration-Statistics';
 
 db.createTables().then(retrieveData);
@@ -68,7 +75,7 @@ function pause(result) {
 function processPdf(date, pdfFile) {
     return new Promise(
         function (resolve, reject) {
-            const stream = tabula(pdfFile, {guess: true, debug: true, spreadsheet: true, pages: 'all'}).streamCsv();
+            const stream = tabula(pdfFile, tabulaOptions).streamCsv();
             let columnTitles = null;
             const precinctRecords = [];
             let ward = null;

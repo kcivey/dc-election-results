@@ -16,13 +16,13 @@
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
-    "csv-parse": "^4.4.1",
-    "knex": "^0.16.5",
+    "csv-parse": "^4.4.3",
+    "knex": "^0.17.6",
     "lodash": "^4.17.11",
     "moment": "^2.24.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
-    "sqlite3": "^4.0.8",
+    "sqlite3": "^4.0.9",
     "tabula-js": "github:kcivey/tabula-js"
   },
   "devDependencies": {
@@ -30,6 +30,6 @@
     "eslint-config-google": "^0.13.0",
     "grunt": "^1.0.4",
     "grunt-bump": "^0.8.0",
-    "load-grunt-tasks": "^4.0.0"
+    "load-grunt-tasks": "^5.0.0"
   }
 }

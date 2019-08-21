@@ -16,17 +16,17 @@
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
-    "csv-parse": "^4.4.3",
-    "knex": "^0.17.6",
-    "lodash": "^4.17.11",
+    "csv-parse": "^4.4.5",
+    "knex": "^0.19.2",
+    "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
-    "sqlite3": "^4.0.9",
+    "sqlite3": "^4.1.0",
     "tabula-js": "github:kcivey/tabula-js"
   },
   "devDependencies": {
-    "eslint": "^5.16.0",
+    "eslint": "^6.2.1",
     "eslint-config-google": "^0.13.0"
   }
 }

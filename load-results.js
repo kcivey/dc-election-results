@@ -14,7 +14,7 @@ const argv = require('yargs')
         },
         create: {
             type: 'boolean',
-            describe: 'rec-create tables',
+            describe: 're-create tables',
         },
     })
     .strict(true)

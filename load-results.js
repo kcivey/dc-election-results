@@ -83,8 +83,10 @@ function transformRecord(record) {
                 newValue = moment(newValue, 'MM/DD/YYYY').format();
                 break;
             case 'election_name':
+                newValue = newValue.replace(/^D\.?C\.? /, '');
+                // fall through
             case 'candidate':
-                newValue = newValue.trim().replace(/\s/g, ' ');
+                newValue = titleCase(newValue.trim().replace(/\s/g, ' '));
                 break;
             case 'contest_name':
                 newValue = standardizeContestName(newValue);
@@ -97,11 +99,24 @@ function transformRecord(record) {
                 newValue = +newValue;
                 break;
             case 'party':
+                newValue = newValue.trim();
                 break;
             default:
                 throw new Error(`Unexpected column "${key}"`);
         }
         newRecord[newKey] = newValue;
+    }
+    if (newRecord.contest_name === 'Council') {
+        newRecord.contest_name += ' Ward ' + newRecord.ward;
+    }
+    if (newRecord.party === 'GRN' && newRecord.election_date >= '2000-01-01') {
+        newRecord.party = 'STG';
+    }
+    else if (newRecord.party === 'CITYWIDE') {
+        newRecord.party = '';
+    }
+    else if (newRecord.party === 'NPN') {
+        newRecord.party = 'NOP';
     }
     return newRecord;
 }
@@ -116,12 +131,23 @@ function standardizeContestName(name) {
         .replace(/(?: (?:of|for|From)(?: the)?)? Distr.*/, '')
         .replace(/U\.s\.|United States/, 'US')
         .replace('At - Large', 'At-Large')
-        .replace(/(?<=Ward )(\w+)/, m => numbers.indexOf(m) + 1)
-        .trim();
+        .replace(/(?<=Ward )(\w+)/, m => (numbers.indexOf(m) + 1) || m)
+        .replace(/(^| )(?:of )?(?:the )?State Board(?: of Ed\w*)?/, '$1SBOE')
+        .replace('Member SBOE', 'SBOE')
+        .replace('Member of the ', '')
+        .replace(/(?:to the )?(?:US )?(?=House)/, '')
+        .replace(/.*President.*/, 'President')
+        .replace('Measure No. ', '#')
+        .replace(/Member State /, '')
+        .replace(/(Ballots Cast|Registered Voters) - .*/, '$1 - Total')
+        .replace(/(Total) (Ballots Cast|Registered Voters)/, '$2 - $1')
+        .trim()
+        .replace(/of the Council$/, 'Council')
+        .replace(/^(Ward \d|At-Large|Chair(?:man))? (Council|SBOE)$/, '$2 $1');
 }
 
 function titleCase(s) {
     return titleize(s)
-        .replace(/\b(?:Anc|Dc|\d[a-g][01]\d|IV]i*|Iv)\b/g, m => m.toUpperCase())
+        .replace(/\b(?:Anc|Dc|\d[a-g][01]\d|[IV]i*|Iv)\b/g, m => m.toUpperCase())
         .replace(/ (?:Of|The|For|And|To)(?= )/g, m => m.toLowerCase());
 }

@@ -80,10 +80,11 @@ function transformRecord(record) {
         switch (newKey) {
             case 'election_date':
                 assert(/^\d\d?\/\d\d?\/\d{4}/.test(newValue), `Unexpected date format "${value}"`);
-                newValue = moment(newValue, 'MM/DD/YYYY').format();
+                newValue = moment(newValue, 'MM/DD/YYYY').format('YYYY-MM-DD');
                 break;
             case 'election_name':
-                newValue = newValue.replace(/^D\.?C\.? /, '');
+                newValue = newValue.replace(/^D\.?C\.? /, '')
+                    .replace('Generation Election', 'General Election');
                 // fall through
             case 'candidate':
                 newValue = titleCase(newValue.trim().replace(/\s/g, ' '));
@@ -118,6 +119,7 @@ function transformRecord(record) {
     else if (newRecord.party === 'NPN') {
         newRecord.party = 'NOP';
     }
+    newRecord.code = newRecord.election_date.replace(/-/g, '') + newRecord.election_name.substr(0, 1);
     return newRecord;
 }
 

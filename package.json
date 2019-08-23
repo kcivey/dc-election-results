@@ -23,7 +23,9 @@
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
     "sqlite3": "^4.1.0",
-    "tabula-js": "github:kcivey/tabula-js"
+    "tabula-js": "github:kcivey/tabula-js",
+    "underscore.string": "^3.3.5",
+    "yargs": "^14.0.0"
   },
   "devDependencies": {
     "eslint": "^6.2.1",

@@ -35,11 +35,11 @@ async function main() {
     const re = new RegExp((argv.year ? argv.year + '.*' : '') + '.csv$', 'i');
     const csvFiles = fs.readdirSync(downloadDir)
         .filter(fn => re.test(fn))
-        .filter(fn => !/2010/.test(fn)) // skip 2010 for now
         .map(fn => downloadDir + '/' + fn);
     for (const csvFile of csvFiles) {
         await loadCsvFile(csvFile);
     }
+    await db.setWardFor2010General();
 }
 
 async function loadCsvFile(csvFile) {
@@ -51,13 +51,15 @@ async function loadCsvFile(csvFile) {
 function readCsvFile(csvFile) {
     console.warn(csvFile);
     return new Promise(function (resolve, reject) {
+        const extra = /General.*2010/.test(csvFile) ?
+            {election_date: '2010-11-02', election_name: 'General Election'} : {};
         const records = [];
         const parser = csvParse({columns: true});
         const input = fs.createReadStream(csvFile);
         parser.on('readable', async function () {
             let record;
             while ((record = parser.read())) {
-                records.push(transformRecord(record));
+                records.push(transformRecord({...record, ...extra}));
             }
         });
         parser.on('error', reject);
@@ -68,10 +70,27 @@ function readCsvFile(csvFile) {
 
 function transformRecord(record) {
     const newRecord = {};
-    const keyMap = {
+    const keyMap = { // use 'SKIP' to skip
         contest_number: 'contest_id',
         ward_number: 'ward',
         precinct_number: 'precinct',
+        pct: 'precinct',
+        contest: 'contest_name',
+        district: 'SKIP',
+        election_type_name: 'election_name',
+        primary_party: 'party',
+        office: 'contest_name',
+        ballot_name: 'candidate',
+        election_precinct_name: 'SKIP',
+        election_precinct_number: 'precinct',
+        ballot_placement: 'SKIP',
+        cand_cont_id: 'SKIP',
+        candidate_order: 'SKIP',
+    };
+    const partyMap = {
+        'Democratic': 'DEM',
+        'Republican': 'REP',
+        'Statehood Green': 'STG',
     };
     for (const [key, value] of Object.entries(record)) {
         let newKey = underscored(key);
@@ -79,12 +98,13 @@ function transformRecord(record) {
         let newValue = value;
         switch (newKey) {
             case 'election_date':
-                assert(/^\d\d?\/\d\d?\/\d{4}/.test(newValue), `Unexpected date format "${value}"`);
-                newValue = moment(newValue, 'MM/DD/YYYY').format('YYYY-MM-DD');
+                assert(/^(?:\d\d?\/\d\d?\/\d{4}|\d{4}-\d\d-\d\d)/.test(newValue), `Unexpected date format "${value}"`);
+                newValue = moment(newValue, ['MM/DD/YYYY', 'YYYY-MM-DD']).format('YYYY-MM-DD');
                 break;
             case 'election_name':
                 newValue = newValue.replace(/^D\.?C\.? /, '')
-                    .replace('Generation Election', 'General Election');
+                    .replace('Generation Election', 'General Election')
+                    .replace('Mayoral Primary', 'Primary Election');
                 // fall through
             case 'candidate':
                 newValue = titleCase(newValue.trim().replace(/\s/g, ' '));
@@ -92,16 +112,23 @@ function transformRecord(record) {
             case 'contest_name':
                 newValue = standardizeContestName(newValue);
                 break;
-            case 'contest_id':
             case 'precinct':
+                if (newRecord.precinct) { // 2010 has both pct (which is just the number) and precinct
+                    continue;
+                }
+                newValue = newValue.replace(/^Precinct /i, '');
+                // fall through
+            case 'contest_id':
             case 'ward':
             case 'votes':
                 assert(/^-?\d+$/.test(newValue), `Unexpected ${key} format "${value}"`);
                 newValue = +newValue;
                 break;
             case 'party':
-                newValue = newValue.trim();
+                newValue = partyMap[newValue] || newValue.trim();
                 break;
+            case 'SKIP':
+                continue;
             default:
                 throw new Error(`Unexpected column "${key}"`);
         }
@@ -118,6 +145,9 @@ function transformRecord(record) {
     }
     else if (newRecord.party === 'NPN') {
         newRecord.party = 'NOP';
+    }
+    if (newRecord.contest_name === newRecord.candidate) { // for ballots and registered in 2010 general
+        newRecord.candidate = '';
     }
     newRecord.code = newRecord.election_date.replace(/-/g, '') + newRecord.election_name.substr(0, 1);
     return newRecord;

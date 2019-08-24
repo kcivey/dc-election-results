@@ -46,14 +46,14 @@ async function main() {
     const rows = await db.getResults(electionCode, {party, anc: argv.anc, sboe: argv.sboe});
     const votes = {};
     for (const row of rows) {
-        if (!votes[row.contest_name]) {
-            votes[row.contest_name] = {};
+        if (!votes[row.contest]) {
+            votes[row.contest] = {};
         }
-        if (!votes[row.contest_name][row.candidate]) {
-            votes[row.contest_name][row.candidate] = /Ward|ANC/.test(row.contest_name) ? {} : [];
-            votes[row.contest_name][row.candidate][0] = row.party;
+        if (!votes[row.contest][row.candidate]) {
+            votes[row.contest][row.candidate] = /Ward|ANC/.test(row.contest) ? {} : [];
+            votes[row.contest][row.candidate][0] = row.party;
         }
-        votes[row.contest_name][row.candidate][row.precinct] = row.votes;
+        votes[row.contest][row.candidate][row.precinct] = row.votes;
     }
     const precinctToWard = await db.getPrecinctWardMapping(electionCode);
     process.stdout.write(JSON.stringify({votes, precinctToWard}, null, argv.pretty ? 2 : 0));

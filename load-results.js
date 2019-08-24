@@ -71,15 +71,16 @@ function readCsvFile(csvFile) {
 function transformRecord(record) {
     const newRecord = {};
     const keyMap = { // use 'SKIP' to skip
-        contest_number: 'contest_id',
+        contest_id: 'SKIP',
+        contest_name: 'contest',
+        contest_number: 'SKIP',
         ward_number: 'ward',
         precinct_number: 'precinct',
         pct: 'precinct',
-        contest: 'contest_name',
         district: 'SKIP',
         election_type_name: 'election_name',
         primary_party: 'party',
-        office: 'contest_name',
+        office: 'contest',
         ballot_name: 'candidate',
         election_precinct_name: 'SKIP',
         election_precinct_number: 'precinct',
@@ -109,7 +110,7 @@ function transformRecord(record) {
             case 'candidate':
                 newValue = titleCase(newValue.trim().replace(/\s/g, ' '));
                 break;
-            case 'contest_name':
+            case 'contest':
                 newValue = standardizeContestName(newValue);
                 break;
             case 'precinct':
@@ -118,7 +119,6 @@ function transformRecord(record) {
                 }
                 newValue = newValue.replace(/^Precinct /i, '');
                 // fall through
-            case 'contest_id':
             case 'ward':
             case 'votes':
                 assert(/^-?\d+$/.test(newValue), `Unexpected ${key} format "${value}"`);
@@ -134,8 +134,8 @@ function transformRecord(record) {
         }
         newRecord[newKey] = newValue;
     }
-    if (newRecord.contest_name === 'Council') {
-        newRecord.contest_name += ' Ward ' + newRecord.ward;
+    if (newRecord.contest === 'Council') {
+        newRecord.contest += ' Ward ' + newRecord.ward;
     }
     if (newRecord.party === 'GRN' && newRecord.election_date >= '2000-01-01') {
         newRecord.party = 'STG';
@@ -146,7 +146,7 @@ function transformRecord(record) {
     else if (newRecord.party === 'NPN') {
         newRecord.party = 'NOP';
     }
-    if (newRecord.contest_name === newRecord.candidate) { // for ballots and registered in 2010 general
+    if (newRecord.contest === newRecord.candidate) { // for ballots and registered in 2010 general
         newRecord.candidate = '';
     }
     newRecord.code = newRecord.election_date.replace(/-/g, '') + newRecord.election_name.substr(0, 1);

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const fs = require('fs');
 const argv = require('yargs')
     .options({
         anc: {
@@ -8,7 +9,7 @@ const argv = require('yargs')
         },
         election: {
             type: 'string',
-            describe: 'election code (eg, 20181106G); defaults to most recent',
+            describe: 'election code (eg, 20181106G) or "all"; defaults to most recent',
             requiresArg: true,
         },
         party: {
@@ -38,23 +39,29 @@ async function main() {
     if (!electionCode) {
         electionCode = await db.getMostRecentElectionCode();
     }
-    if (!/P$/.test(electionCode) && party) {
+    if (!/P$/i.test(electionCode) && party) {
         console.warn('Ignoring party since election is not a primary');
         party = null;
     }
-    console.warn('getting', electionCode);
-    const rows = await db.getResults(electionCode, {party, anc: argv.anc, sboe: argv.sboe});
-    const votes = {};
-    for (const row of rows) {
-        if (!votes[row.contest]) {
-            votes[row.contest] = {};
+    const electionCodes = electionCode === 'all' ? await db.getElectionCodes() : [electionCode];
+    for (const electionCode of electionCodes) {
+        console.warn('getting', electionCode);
+        const rows = await db.getResults(electionCode, {party, anc: argv.anc, sboe: argv.sboe});
+        const votes = {};
+        for (const row of rows) {
+            if (!votes[row.contest]) {
+                votes[row.contest] = {};
+            }
+            if (!votes[row.contest][row.candidate]) {
+                votes[row.contest][row.candidate] = /Ward|ANC/.test(row.contest) ? {} : [];
+                votes[row.contest][row.candidate][0] = row.party;
+            }
+            votes[row.contest][row.candidate][row.precinct] = row.votes;
         }
-        if (!votes[row.contest][row.candidate]) {
-            votes[row.contest][row.candidate] = /Ward|ANC/.test(row.contest) ? {} : [];
-            votes[row.contest][row.candidate][0] = row.party;
-        }
-        votes[row.contest][row.candidate][row.precinct] = row.votes;
+        const precinctToWard = await db.getPrecinctWardMapping(electionCode);
+        fs.writeFileSync(
+            __dirname + '/' + electionCode + '.json',
+            JSON.stringify({votes, precinctToWard}, null, argv.pretty ? 2 : 0)
+        );
     }
-    const precinctToWard = await db.getPrecinctWardMapping(electionCode);
-    process.stdout.write(JSON.stringify({votes, precinctToWard}, null, argv.pretty ? 2 : 0));
 }

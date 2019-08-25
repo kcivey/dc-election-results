@@ -3,27 +3,31 @@
 const fs = require('fs');
 const argv = require('yargs')
     .options({
-        anc: {
+        'anc': {
             type: 'boolean',
             describe: 'include advisory neighborhood commissioners (use --no-anc to omit)',
         },
-        election: {
+        'election': {
             type: 'string',
             describe: 'election code (eg, 20181106G) or "all"; defaults to most recent',
             requiresArg: true,
         },
-        party: {
+        'party': {
             type: 'string',
             describe: 'party (only for primaries',
             requiresArg: true,
         },
-        pretty: {
+        'pretty': {
             type: 'boolean',
             describe: 'pretty-print the JSON',
         },
-        sboe: {
+        'sboe': {
             type: 'boolean',
             describe: 'include State Board of Education (use --no-sboe to omit)',
+        },
+        'ward-map': {
+            type: 'boolean',
+            describe: 'make JSON only for ward map',
         },
     })
     .strict(true)
@@ -45,7 +49,7 @@ async function main() {
     }
     const electionCodes = electionCode === 'all' ? await db.getElectionCodes() : [electionCode];
     for (const electionCode of electionCodes) {
-        console.warn('getting', electionCode);
+        console.warn('Getting', electionCode);
         const rows = await db.getResults(electionCode, {party, anc: argv.anc, sboe: argv.sboe});
         const votes = {};
         for (const row of rows) {
@@ -59,9 +63,13 @@ async function main() {
             votes[row.contest][row.candidate][row.precinct] = row.votes;
         }
         const precinctToWard = await db.getPrecinctWardMapping(electionCode);
-        fs.writeFileSync(
-            __dirname + '/' + electionCode + '.json',
-            JSON.stringify({votes, precinctToWard}, null, argv.pretty ? 2 : 0)
+        const outputFile = __dirname + '/' + electionCode + '.json';
+        const json = JSON.stringify(
+            argv['ward-map'] ? precinctToWard : {votes, precinctToWard},
+            null,
+            argv.pretty ? 2 : 0
         );
+        fs.writeFileSync(outputFile, json);
+        console.warn('Written to', outputFile);
     }
 }

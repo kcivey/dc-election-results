@@ -43,7 +43,6 @@ async function main() {
 }
 
 async function loadCsvFile(csvFile) {
-
     const records = await readCsvFile(csvFile);
     await db.insertResultRecords(records);
 }
@@ -51,8 +50,9 @@ async function loadCsvFile(csvFile) {
 function readCsvFile(csvFile) {
     console.warn(csvFile);
     return new Promise(function (resolve, reject) {
-        const extra = /General.*2010/.test(csvFile) ?
-            {election_date: '2010-11-02', election_name: 'General Election'} : {};
+        const extra = /General.*2010/.test(csvFile) ? {election_date: '2010-11-02', election_name: 'General Election'} :
+            /General.*08/.test(csvFile) ? {election_date: '2008-11-04', election_name: 'General Election'} :
+                /Primary.*08/.test(csvFile) ? {election_date: '2008-09-09', election_name: 'Primary Election'} : {};
         const records = [];
         const parser = csvParse({columns: true});
         const input = fs.createReadStream(csvFile);
@@ -71,27 +71,45 @@ function readCsvFile(csvFile) {
 function transformRecord(record) {
     const newRecord = {};
     const keyMap = { // use 'SKIP' to skip
-        contest_id: 'SKIP',
-        contest_name: 'contest',
-        contest_number: 'SKIP',
-        ward_number: 'ward',
-        precinct_number: 'precinct',
-        pct: 'precinct',
-        district: 'SKIP',
-        election_type_name: 'election_name',
-        primary_party: 'party',
-        office: 'contest',
         ballot_name: 'candidate',
-        election_precinct_name: 'SKIP',
-        election_precinct_number: 'precinct',
         ballot_placement: 'SKIP',
         cand_cont_id: 'SKIP',
+        candidate_full_name: 'candidate',
         candidate_order: 'SKIP',
+        candidate_party_id: 'SKIP',
+        contest_id: 'SKIP',
+        contest_full_name: 'contest',
+        contest_name: 'contest',
+        contest_number: 'SKIP',
+        contest_order: 'SKIP',
+        contest_party_id: 'SKIP',
+        contest_total: 'SKIP',
+        contest_type: 'SKIP',
+        contest_vote_for: 'SKIP',
+        district: 'SKIP',
+        office: 'contest',
+        primary_party: 'party',
+        election_precinct_name: 'SKIP',
+        election_precinct_number: 'precinct',
+        election_type_name: 'election_name',
+        is_writein: 'SKIP',
+        pct: 'precinct',
+        precinct_id: 'precinct',
+        precinct_name: 'SKIP',
+        precinct_number: 'precinct',
+        precinct_order: 'SKIP',
+        processed_done: 'SKIP',
+        processed_started: 'SKIP',
+        total: 'votes',
+        ward_number: 'ward',
     };
     const partyMap = {
         'Democratic': 'DEM',
         'Republican': 'REP',
         'Statehood Green': 'STG',
+        'SG': 'STG',
+        'NPN': 'NOP',
+        'IND': 'NOP',
     };
     for (const [key, value] of Object.entries(record)) {
         let newKey = underscored(key);
@@ -108,7 +126,18 @@ function transformRecord(record) {
                     .replace('Mayoral Primary', 'Primary Election');
                 // fall through
             case 'candidate':
-                newValue = titleCase(newValue.trim().replace(/\s/g, ' '));
+                const m = newValue.match(/^(DEM|REP|SG|LIB|IND) - (.+)/); // really only happens in 2008
+                if (m) {
+                    newValue = m[2];
+                    newRecord.party = partyMap[m[1]] || m[1];
+                }
+                newValue = titleCase(newValue.trim().replace(/\s+/g, ' '));
+                if (/Ballots|Registered/.test(newValue)) { // repeated from contest in 2010 general
+                    newValue = '';
+                }
+                else if (/^Write.In/.test(newValue)) {
+                    newValue = 'Write-In';
+                }
                 break;
             case 'contest':
                 newValue = standardizeContestName(newValue);
@@ -142,12 +171,6 @@ function transformRecord(record) {
     }
     else if (newRecord.party === 'CITYWIDE') {
         newRecord.party = '';
-    }
-    else if (newRecord.party === 'NPN') {
-        newRecord.party = 'NOP';
-    }
-    if (newRecord.contest === newRecord.candidate) { // for ballots and registered in 2010 general
-        newRecord.candidate = '';
     }
     newRecord.code = newRecord.election_date.replace(/-/g, '') + newRecord.election_name.substr(0, 1);
     return newRecord;

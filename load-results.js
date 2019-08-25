@@ -140,6 +140,9 @@ function transformRecord(record) {
                 }
                 break;
             case 'contest':
+                if (/Nonpartisan/i.test(newValue)) {
+                    newRecord.party = 'NON';
+                }
                 newValue = standardizeContestName(newValue);
                 break;
             case 'precinct':
@@ -154,7 +157,13 @@ function transformRecord(record) {
                 newValue = +newValue;
                 break;
             case 'party':
-                newValue = partyMap[newValue] || newValue.trim();
+                newValue = newValue.trim();
+                if (!newRecord.party && newValue) {
+                    newValue = partyMap[newValue] || newValue;
+                }
+                else {
+                    newValue = newRecord.party;
+                }
                 break;
             case 'SKIP':
                 continue;
@@ -194,8 +203,8 @@ function standardizeContestName(name) {
         .replace(/.*President.*/, 'President')
         .replace('Measure No. ', '#')
         .replace(/Member State /, '')
-        .replace(/(Ballots Cast|Registered Voters) - .*/, '$1 - Total')
-        .replace(/(Total) (Ballots Cast|Registered Voters)/, '$2 - $1')
+        .replace(/(Ballots Cast|Registered Voters) - (?!Blank).*/, '$1 - Total')
+        .replace(/(Total|Blank) (Ballots Cast|Registered Voters)/, '$2 - $1')
         .trim()
         .replace(/of the Council$/, 'Council')
         .replace(/^(Ward \d|At-Large|Chair(?:man))? (Council|SBOE)$/, '$2 $1');

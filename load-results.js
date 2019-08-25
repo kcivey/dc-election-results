@@ -32,14 +32,14 @@ async function main() {
     else {
         await db.deleteResultRecords(argv.year);
     }
-    const re = new RegExp((argv.year ? argv.year + '.*' : '') + '.csv$', 'i');
+    const re = new RegExp((argv.year ? argv.year + '.*' : '') + '\\.csv$', 'i');
     const csvFiles = fs.readdirSync(downloadDir)
         .filter(fn => re.test(fn))
         .map(fn => downloadDir + '/' + fn);
     for (const csvFile of csvFiles) {
         await loadCsvFile(csvFile);
     }
-    await db.setWardFor2010General();
+    return await db.setWardFor2010General();
 }
 
 async function loadCsvFile(csvFile) {

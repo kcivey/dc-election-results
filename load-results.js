@@ -4,7 +4,7 @@ const assert = require('assert');
 const fs = require('fs');
 const csvParse = require('csv-parse');
 const moment = require('moment');
-const {titleize, underscored} = require('underscore.string');
+const {underscored} = require('underscore.string');
 const argv = require('yargs')
     .options({
         year: {
@@ -211,7 +211,8 @@ function standardizeContestName(name) {
 }
 
 function titleCase(s) {
-    return titleize(s)
-        .replace(/\b(?:Anc|Dc|\d[a-g][01]\d|[IV]i*|Iv)\b/g, m => m.toUpperCase())
+    return s.toLowerCase()
+        .replace(/([a-z])([a-z]*)/g, (m, m1, m2) => m1.toUpperCase() + m2)
+        .replace(/\b(?:Anc|Dc|SMD|[IV]i*|Iv)\b/g, m => m.toUpperCase())
         .replace(/ (?:Of|The|For|And|To)(?= )/g, m => m.toLowerCase());
 }

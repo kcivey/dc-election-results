@@ -8,6 +8,7 @@ class ElectionResults {
     }
 
     getPrecinct(number) {
+        return new Precinct(number, this);
     }
 
     getWardForPrecinct(number) {
@@ -48,6 +49,10 @@ class ElectionResults {
         return this.votes[contest][candidate];
     }
 
+    getCandidates() {
+        return Object.keys(this.getVotes());
+    }
+
 }
 
 class Precinct {
@@ -81,8 +86,11 @@ class Precinct {
     }
 
     getTotal() {
-        const contestVotes = this.getVotes();
-        return Object.values(contestVotes).reduce((a, b) => a + b);
+        if (this.total === undefined) {
+            const contestVotes = this.getVotes();
+            this.total = Object.values(contestVotes).reduce((a, b) => a + b);
+        }
+        return this.total;
     }
 
     getPercent(candidate = null) {
@@ -98,20 +106,40 @@ class Precinct {
     }
 
     getCandidates() {
-        return Object.keys(this.getVotes());
+        if (this.candidates === undefined) {
+            this.candidates = Object.keys(this.getVotes());
+        }
+        return this.candidates;
     }
 
     getWinner() {
-        const contestVotes = this.getVotes();
-        let winner;
-        let max = -1;
-        for (const [candidate, votes] of contestVotes) {
-            if (votes > max) {
-                winner = candidate;
-                max = votes;
+        if (this.winner === undefined) {
+            const contestVotes = this.getVotes();
+            let max = -1;
+            for (const [candidate, votes] of Object.entries(contestVotes)) {
+                if (votes > max) {
+                    this.winner = candidate;
+                    max = votes;
+                }
             }
         }
-        return winner;
+        return this.winner;
+    }
+
+    getSecondPlace() {
+        if (this.total === undefined) {
+            const contestVotes = this.getVotes();
+            this.secondPlace = this.getCandidates()
+                .sort((c1, c2) => contestVotes[c2] - contestVotes[c1])[1];
+        }
+        return this.secondPlace;
+    }
+
+    reset() {
+        delete this.winner;
+        delete this.secondPlace;
+        delete this.candidates;
+        delete this.total;
     }
 
 }

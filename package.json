@@ -33,7 +33,6 @@
     "yargs": "^14.2.0"
   },
   "devDependencies": {
-    "eslint": "^6.5.1",
-    "eslint-config-google": "^0.13.0"
+    "eslint": "^6.5.1"
   }
 }

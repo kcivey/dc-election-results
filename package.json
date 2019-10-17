@@ -15,25 +15,25 @@
     "url": "https://github.com/kcivey/dc-election-results/issues"
   },
   "dependencies": {
-    "@babel/cli": "^7.5.5",
-    "@babel/core": "^7.5.5",
-    "@babel/polyfill": "^7.4.4",
-    "@babel/preset-env": "^7.5.5",
+    "@babel/cli": "^7.6.4",
+    "@babel/core": "^7.6.4",
+    "@babel/polyfill": "^7.6.0",
+    "@babel/preset-env": "^7.6.3",
     "cheerio": "^1.0.0-rc.3",
-    "csv-parse": "^4.4.5",
-    "knex": "^0.19.2",
+    "csv-parse": "^4.6.3",
+    "knex": "^0.19.5",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
     "sqlite3": "^4.1.0",
     "tabula-js": "github:kcivey/tabula-js",
-    "terser": "^4.2.1",
+    "terser": "^4.3.9",
     "underscore.string": "^3.3.5",
-    "yargs": "^14.0.0"
+    "yargs": "^14.2.0"
   },
   "devDependencies": {
-    "eslint": "^6.2.1",
+    "eslint": "^6.5.1",
     "eslint-config-google": "^0.13.0"
   }
 }

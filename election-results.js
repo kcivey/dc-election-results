@@ -143,3 +143,7 @@ class Precinct {
     }
 
 }
+
+if (module && module.exports) {
+    module.exports = ElectionResults;
+}

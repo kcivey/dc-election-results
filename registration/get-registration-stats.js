@@ -28,7 +28,8 @@ function retrieveData() {
     request(listUrl).then(
         async function (html) {
             const $ = cheerio.load(html);
-            const links = $('#hierarchical_accordion').find('li > a').toArray();
+            const links = $('#hierarchical_accordion').find('li > a')
+                .toArray();
             for (const link of links) {
                 const url = $(link).attr('href');
                 const text = $(link).text();
@@ -74,7 +75,7 @@ function pause(result) {
 
 function processPdf(date, pdfFile) {
     return new Promise(
-        function (resolve, reject) {
+        function (resolve) {
             const stream = tabula(pdfFile, tabulaOptions).streamCsv();
             let columnTitles = null;
             const precinctRecords = [];
@@ -86,14 +87,14 @@ function processPdf(date, pdfFile) {
                         return;
                     }
                     line = line.replace(/\s+/g, ' ');
-                    const data = csvParse(line)[0].map(v => /^[\d,.]+$/.test(v) ? +v.replace(',', '') : v);
+                    const data = csvParse(line)[0].map(v => (/^[\d,.]+$/.test(v) ? +v.replace(',', '') : v));
                     const m = line.match(/WARD (\d) REGISTRATION SUMMARY|NEW REGISTRATIONS/);
                     if (m || data.length < 2) {
                         columnTitles = null;
                         ward = m && m[1] ? +m[1] : null;
                         return;
                     }
-                    else if (!columnTitles) {
+                    if (!columnTitles) {
                         columnTitles = data.map(_.camelCase);
                         return;
                     }

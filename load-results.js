@@ -39,7 +39,7 @@ async function main() {
     for (const csvFile of csvFiles) {
         await loadCsvFile(csvFile);
     }
-    return await db.setWardFor2010General();
+    return db.setWardFor2010General();
 }
 
 async function loadCsvFile(csvFile) {
@@ -50,13 +50,17 @@ async function loadCsvFile(csvFile) {
 function readCsvFile(csvFile) {
     console.warn(csvFile);
     return new Promise(function (resolve, reject) {
-        const extra = /General.*2010/.test(csvFile) ? {election_date: '2010-11-02', election_name: 'General Election'} :
-            /General.*08/.test(csvFile) ? {election_date: '2008-11-04', election_name: 'General Election'} :
-                /Primary.*08/.test(csvFile) ? {election_date: '2008-09-09', election_name: 'Primary Election'} : {};
+        const extra = /General.*2010/.test(csvFile)
+            ? {election_date: '2010-11-02', election_name: 'General Election'}
+            : /General.*08/.test(csvFile)
+                ? {election_date: '2008-11-04', election_name: 'General Election'}
+                : /Primary.*08/.test(csvFile)
+                    ? {election_date: '2008-09-09', election_name: 'Primary Election'}
+                    : {};
         const records = [];
         const parser = csvParse({columns: true});
         const input = fs.createReadStream(csvFile);
-        parser.on('readable', async function () {
+        parser.on('readable', function () {
             let record;
             while ((record = parser.read())) {
                 records.push(transformRecord({...record, ...extra}));
@@ -125,7 +129,7 @@ function transformRecord(record) {
                     .replace('Generation Election', 'General Election')
                     .replace('Mayoral Primary', 'Primary Election');
                 // fall through
-            case 'candidate':
+            case 'candidate': {
                 const m = newValue.match(/^(DEM|REP|SG|LIB|IND) - (.+)/); // really only happens in 2008
                 if (m) {
                     newValue = m[2];
@@ -139,6 +143,7 @@ function transformRecord(record) {
                     newValue = 'Write-In';
                 }
                 break;
+            }
             case 'contest':
                 if (/Nonpartisan/i.test(newValue)) {
                     newRecord.party = 'NON';

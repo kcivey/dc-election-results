@@ -1,60 +1,3 @@
-class ElectionResults {
-
-    constructor(votes, precinctToWard) {
-        this.votes = votes;
-        this.precinctToWard = precinctToWard;
-        this.currentContest = null;
-        this.currentCandidate = null;
-    }
-
-    getPrecinct(number) {
-        return new Precinct(number, this);
-    }
-
-    getWardForPrecinct(number) {
-        return this.precinctToWard[number];
-    }
-
-    setCurrentContest(contest) {
-        if (!this.votes.hasOwnProperty(contest)) {
-            throw new Error(`Unknown contest "${contest}"`);
-        }
-        this.currentContest = contest;
-        return this;
-    }
-
-    setCurrentCandidate(candidate) {
-        const contest = this.currentContest;
-        if (!contest) {
-            throw new Error('Contest must be set before candidate');
-        }
-        if (!this.votes[contest].hasOwnProperty(candidate)) {
-            throw new Error(`No candidate "${candidate}" in contest "${contest}"`);
-        }
-        this.currentCandidate = candidate;
-        return this;
-    }
-
-    getVotes(candidate = null) {
-        const contest = this.currentContest;
-        if (!contest) {
-            throw new Error('Contest must be set before getting votes');
-        }
-        if (!candidate) {
-            return this.votes[contest];
-        }
-        if (!this.votes[contest].hasOwnProperty(candidate)) {
-            throw new Error(`No candidate "${candidate}" in contest "${contest}"`);
-        }
-        return this.votes[contest][candidate];
-    }
-
-    getCandidates() {
-        return Object.keys(this.getVotes());
-    }
-
-}
-
 class Precinct {
 
     constructor(number, electionResults) {
@@ -140,6 +83,63 @@ class Precinct {
         delete this.secondPlace;
         delete this.candidates;
         delete this.total;
+    }
+
+}
+
+class ElectionResults {
+
+    constructor(votes, precinctToWard) {
+        this.votes = votes;
+        this.precinctToWard = precinctToWard;
+        this.currentContest = null;
+        this.currentCandidate = null;
+    }
+
+    getPrecinct(number) {
+        return new Precinct(number, this);
+    }
+
+    getWardForPrecinct(number) {
+        return this.precinctToWard[number];
+    }
+
+    setCurrentContest(contest) {
+        if (!this.votes.hasOwnProperty(contest)) {
+            throw new Error(`Unknown contest "${contest}"`);
+        }
+        this.currentContest = contest;
+        return this;
+    }
+
+    setCurrentCandidate(candidate) {
+        const contest = this.currentContest;
+        if (!contest) {
+            throw new Error('Contest must be set before candidate');
+        }
+        if (!this.votes[contest].hasOwnProperty(candidate)) {
+            throw new Error(`No candidate "${candidate}" in contest "${contest}"`);
+        }
+        this.currentCandidate = candidate;
+        return this;
+    }
+
+    getVotes(candidate = null) {
+        const contest = this.currentContest;
+        if (!contest) {
+            throw new Error('Contest must be set before getting votes');
+        }
+        if (!candidate) {
+            return this.votes[contest];
+        }
+        if (!this.votes[contest].hasOwnProperty(candidate)) {
+            throw new Error(`No candidate "${candidate}" in contest "${contest}"`);
+        }
+        return this.votes[contest][candidate];
+    }
+
+    getCandidates() {
+        return Object.keys(this.getVotes());
     }
 
 }

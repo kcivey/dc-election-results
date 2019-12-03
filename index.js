@@ -48,11 +48,9 @@ jQuery(function () {
             const candidates = electionResults.getCandidates();
             const colors = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628'];
             const candidateColors = {};
-            let i = 0;
-            for (const candidate of candidates) {
+            candidates.forEach(function (candidate, i) {
                 candidateColors[candidate] = colors[i % candidates.length];
-                i++;
-            }
+            });
             const style2 = function (feature, precinct) {
                 const winner = precinct.getWinner();
                 const color = candidateColors[winner];

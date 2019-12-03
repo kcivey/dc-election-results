@@ -3,7 +3,6 @@
 rm dist/*
 cp -u *.{js,json,html} dist/
 echo 'Compiling and minifying JS'
-npx babel index.js | \
-    npx browserify - | \
+npx browserify -t babelify index.js | \
     npx terser -c -m --toplevel --comments /Copyright/ \
     > dist/index.js

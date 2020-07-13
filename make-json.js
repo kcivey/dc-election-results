@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const assert = require('assert');
 const fs = require('fs');
 const argv = require('yargs')
     .options({
@@ -52,6 +53,7 @@ async function main() {
         console.warn('Getting', electionCode);
         const rows = await db.getResults(electionCode, {party, anc: argv.anc, sboe: argv.sboe});
         const votes = {};
+        assert(rows.length, `No results found for election "${electionCode}"`);
         for (const row of rows) {
             if (!votes[row.contest]) {
                 votes[row.contest] = {};

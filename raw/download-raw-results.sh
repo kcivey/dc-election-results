@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 for URL in \
-https://electionresults.dcboe.org/Downloads/Reports/June_16_2020_Special_Election_Certified_Results.csv \ll
+https://electionresults.dcboe.org/Downloads/Reports/November_3_2020_General_Election_Election_Night_Unofficial_Results.csv \
+https://electionresults.dcboe.org/Downloads/Reports/June_16_2020_Special_Election_Certified_Results.csv \
 https://electionresults.dcboe.org/Downloads/Reports/June_2_2020_Primary_Election_Certified_Results.csv \
 https://electionresults.dcboe.org/Downloads/Reports/December_4_2018_Special_Election_Certified_Results.csv \
 https://electionresults.dcboe.org/Downloads/Reports/November_6_2018_General_Election_Certified_Results.csv \

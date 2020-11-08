@@ -11,7 +11,7 @@ const Choropleth = require('choropleth-js');
 jQuery(function () {
     let votes;
     let precinctToWard;
-    fetch('20180619P.json')
+    fetch('20200602P.json')
         .then(response => response.json())
         .then(function (data) {
             votes = data.votes;
@@ -28,8 +28,8 @@ jQuery(function () {
                 opacity: 0.5,
             });
             const electionResults = new ElectionResults(votes, precinctToWard);
-            const candidate = 'Jeremiah Lowery';
-            electionResults.setCurrentContest('Council At-Large')
+            const candidate = 'Jordan Grossman';
+            electionResults.setCurrentContest('Dem Council Ward 2')
                 .setCurrentCandidate(candidate);
             const data = function (id) {
                 const precinctNumber = id.replace(/^\D*/, '');

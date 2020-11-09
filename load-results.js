@@ -130,10 +130,12 @@ function transformRecord(record) {
                     .replace('Mayoral Primary', 'Primary Election');
                 // fall through
             case 'candidate': {
-                const m = newValue.match(/^(DEM|REP|SG|LIB|IND) - (.+)/); // really only happens in 2008
+                const m = newValue.match(/^(DEM|REP|ST?G|LIB|IND) -?\s*(.+)/); // really only happens in 2008 and 2020
                 if (m) {
                     newValue = m[2];
-                    newRecord.party = partyMap[m[1]] || m[1];
+                    if (!newRecord.party) {
+                        newRecord.party = partyMap[m[1]] || m[1];
+                    }
                 }
                 newValue = titleCase(newValue.trim().replace(/\s+/g, ' '));
                 if (/Ballots|Registered/.test(newValue)) { // repeated from contest in 2010 general

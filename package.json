@@ -28,11 +28,11 @@
     "moment": "^2.29.1",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.9",
-    "sqlite3": "^4.2.0",
+    "sqlite3": "^5.0.0",
     "tabula-js": "github:kcivey/tabula-js",
-    "terser": "^4.8.0",
+    "terser": "^5.3.8",
     "underscore.string": "^3.3.5",
-    "yargs": "^15.4.1"
+    "yargs": "^16.1.0"
   },
   "devDependencies": {
     "eslint": "^7.13.0"

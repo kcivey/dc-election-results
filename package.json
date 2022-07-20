@@ -30,7 +30,7 @@
     "request-promise-native": "^1.0.9",
     "sqlite3": "^5.0.2",
     "tabula-js": "github:kcivey/tabula-js",
-    "terser": "^5.10.0",
+    "terser": "^5.14.2",
     "underscore.string": "^3.3.5",
     "yargs": "^16.2.0"
   },

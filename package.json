@@ -23,7 +23,7 @@
     "cheerio": "^1.0.0-rc.10",
     "choropleth-js": "github:kcivey/choropleth-js",
     "csv-parse": "^4.16.3",
-    "knex": "^0.21.21",
+    "knex": "^2.4.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "request": "^2.88.2",
